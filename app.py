@@ -154,12 +154,6 @@ div[data-baseweb="select"] {
     border-radius: 12px;
 }
 
-/* Slider */
-
-.stSlider {
-    padding-top: 10px;
-}
-
 /* Download button */
 
 .stDownloadButton > button {
@@ -176,17 +170,6 @@ div[data-baseweb="select"] {
     border: none;
 }
 
-/* Scrollbar */
-
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #ff5e62;
-    border-radius: 10px;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -200,43 +183,58 @@ st.markdown(
     </div>
 
     <div class='subtitle'>
-        Recruiter Simulation Engine • ATS Analyzer • Gen-Z Roast AI
+        ATS Analyzer • JD Matcher • Recruiter Simulation • Gen-Z Roast AI
     </div>
     """,
     unsafe_allow_html=True
 )
 
 # =========================
-# SETTINGS CARD
+# INPUT SECTION
 # =========================
-with st.container():
+st.markdown("<div class='glass'>", unsafe_allow_html=True)
 
-    st.markdown("<div class='glass'>", unsafe_allow_html=True)
+level = st.slider(
+    "🔥 Roast Level",
+    1,
+    10,
+    5
+)
 
-    level = st.slider(
-        "🔥 Roast Level",
-        1,
-        10,
-        5
-    )
+recruiter_mode = st.selectbox(
+    "😈 Recruiter Personality",
+    [
+        "FAANG Recruiter 👔",
+        "Startup Founder 🚀",
+        "Toxic HR 💀",
+        "Gen-Z Recruiter 🔥",
+        "ATS Bot 🤖"
+    ]
+)
 
-    recruiter_mode = st.selectbox(
-        "😈 Recruiter Personality",
-        [
-            "FAANG Recruiter 👔",
-            "Startup Founder 🚀",
-            "Toxic HR 💀",
-            "Gen-Z Recruiter 🔥",
-            "ATS Bot 🤖"
-        ]
-    )
+uploaded_file = st.file_uploader(
+    "📄 Upload Resume PDF",
+    type=["pdf"]
+)
 
-    uploaded_file = st.file_uploader(
-        "📄 Upload Resume PDF",
-        type=["pdf"]
-    )
+job_description = st.text_area(
+    "💼 Paste Job Description",
+    height=250,
+    placeholder="""
+Example:
 
-    st.markdown("</div>", unsafe_allow_html=True)
+We are looking for a frontend developer skilled in:
+React.js
+Next.js
+Tailwind CSS
+TypeScript
+REST APIs
+Git
+Deployment
+"""
+)
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 resume_text = ""
 
@@ -273,7 +271,15 @@ if st.button("🚀 Analyze My Resume"):
 
         Analyze this resume dynamically.
 
-        Return EXACTLY:
+        If recruiter mode is Gen-Z:
+        Use meme humor, internet slang, sarcasm,
+        and funny Gen-Z style roasting.
+
+        Compare the uploaded resume with the provided job description.
+
+        Generate realistic and dynamic analysis.
+
+        Return EXACTLY in this format:
 
         ATS SCORE: <number>
 
@@ -284,6 +290,8 @@ if st.button("🚀 Analyze My Resume"):
         GHOSTING PROBABILITY: <percentage>
 
         CORPORATE SURVIVAL RATING: <rating>
+
+        MATCH SCORE: <percentage>
 
         RECRUITER REACTION:
         <reaction>
@@ -297,17 +305,23 @@ if st.button("🚀 Analyze My Resume"):
         PROBLEMS:
         <problems>
 
-        MISSING SKILLS:
-        <missing skills>
+        MISSING KEYWORDS:
+        <missing keywords>
 
-        IMPROVEMENT SUGGESTIONS:
-        <suggestions>
+        JOB FIT ANALYSIS:
+        <analysis>
+
+        TAILORED IMPROVEMENTS:
+        <specific suggestions>
 
         FINAL VERDICT:
         <verdict>
 
         Resume:
         {resume_text}
+
+        Job Description:
+        {job_description}
 
         Roast Level:
         {level}/10
@@ -359,15 +373,40 @@ if st.button("🚀 Analyze My Resume"):
                 roast
             )
 
+            match_score_match = re.search(
+                r"MATCH SCORE:\s*(\d+%)",
+                roast
+            )
+
             score = int(score_match.group(1)) if score_match else 50
 
-            shortlist = shortlist_match.group(1) if shortlist_match else "50%"
-            interview = interview_match.group(1) if interview_match else "50%"
-            ghosting = ghost_match.group(1) if ghost_match else "50%"
-            survival = survival_match.group(1) if survival_match else "Average Human"
+            shortlist = (
+                shortlist_match.group(1)
+                if shortlist_match else "50%"
+            )
+
+            interview = (
+                interview_match.group(1)
+                if interview_match else "50%"
+            )
+
+            ghosting = (
+                ghost_match.group(1)
+                if ghost_match else "50%"
+            )
+
+            survival = (
+                survival_match.group(1)
+                if survival_match else "Average Human"
+            )
+
+            match_score = (
+                match_score_match.group(1)
+                if match_score_match else "50%"
+            )
 
             # =========================
-            # RESULTS SECTION
+            # ATS SCORE SECTION
             # =========================
             st.markdown("<div class='glass'>", unsafe_allow_html=True)
 
@@ -380,10 +419,46 @@ if st.button("🚀 Analyze My Resume"):
                 f"{score}/100"
             )
 
+            if score >= 80:
+                st.success("🔥 Excellent Resume")
+
+            elif score >= 60:
+                st.info("👍 Decent Resume")
+
+            else:
+                st.error("💀 Resume needs serious improvements")
+
             st.markdown("</div>", unsafe_allow_html=True)
 
             # =========================
-            # METRICS
+            # JD MATCH SECTION
+            # =========================
+            st.markdown("<div class='glass'>", unsafe_allow_html=True)
+
+            st.subheader("🎯 Job Description Match")
+
+            st.metric(
+                "💼 Resume Match Score",
+                match_score
+            )
+
+            match_number = int(
+                match_score.replace("%", "")
+            )
+
+            if match_number >= 80:
+                st.success("🔥 Strong Match for this role")
+
+            elif match_number >= 60:
+                st.info("👍 Decent match but can improve")
+
+            else:
+                st.error("💀 Recruiter rejection speedrun")
+
+            st.markdown("</div>", unsafe_allow_html=True)
+
+            # =========================
+            # REALITY CHECK
             # =========================
             st.subheader("📡 Resume Reality Check")
 
